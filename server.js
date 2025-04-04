@@ -9,6 +9,13 @@ const { ObjectID } = require("mongodb");
 const LocalStrategy = require("passport-local");
 const app = express();
 
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/");
+}
+
 app.set("view engine", "pug");
 app.set("views", "./views/pug");
 
@@ -70,8 +77,8 @@ myDB(async (client) => {
     }
   );
 
-  app.get("/profile", (req, res) => {
-    res.render("profile", { user: req.user });
+  app.get("/profile", ensureAuthenticated, (req, res) => {
+    res.render("profile");
   });
 
   //End of myDB Block
