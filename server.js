@@ -61,6 +61,20 @@ myDB(async (client) => {
       });
     })
   );
+
+  app.post(
+    "/login",
+    passport.authenticate("local", { failureRedirect: "/" }),
+    (req, res) => {
+      res.redirect("/profile");
+    }
+  );
+
+  app.get("/profile", (req, res) => {
+    res.render("profile", { user: req.user });
+  });
+
+  //End of myDB Block
 }).catch((e) => {
   app.route("/").get((req, res) => {
     res.render("index", { title: e, message: "Unable to connect to database" });
