@@ -3,6 +3,7 @@ const passport = require("passport");
 const { ObjectID } = require("mongodb");
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
+const GitHubStrategy = require("passport-github").Strategy;
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
@@ -35,6 +36,7 @@ module.exports = function (app, myDataBase) {
     });
   });
 
+  //Local strategy
   passport.use(
     new LocalStrategy((username, password, done) => {
       myDataBase.findOne({ username: username }, (err, user) => {
@@ -47,6 +49,46 @@ module.exports = function (app, myDataBase) {
         return done(null, user);
       });
     })
+  );
+
+  //Github strategy
+  passport.use(
+    new GitHubStrategy(
+      {
+        clientID: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        callbackURL: "https://k2pfcg-8080.csb.app/auth/github/callback",
+      },
+      function (accessToken, refreshToken, profile, cb) {
+        console.log(profile);
+        myDataBase.findOneAndUpdate(
+          { id: profile.id },
+          {
+            $setOnInsert: {
+              id: profile.id,
+              username: profile.username,
+              name: profile.displayName || "John Doe",
+              photo: profile.photos[0].value || "",
+              email: Array.isArray(profile.emails)
+                ? profile.emails[0]
+                : "No public email",
+              created_on: new Date(),
+              provider: profile.provider || "",
+            },
+            $set: {
+              last_login: new Date(),
+            },
+            $inc: {
+              login_count: 1,
+            },
+          },
+          { upsert: true, new: true },
+          (err, doc) => {
+            return cb(null, doc.value);
+          }
+        );
+      }
+    )
   );
 
   // Authenticate route
@@ -92,4 +134,15 @@ module.exports = function (app, myDataBase) {
       res.redirect("/profile");
     }
   );
+
+  //Social Authentification
+  app.route("/auth/github").get(passport.authenticate("github"));
+  app
+    .route("/auth/github/callback")
+    .get(
+      passport.authenticate("github", { failureRedirect: "/" }),
+      (req, res) => {
+        res.redirect("/profile");
+      }
+    );
 };

@@ -5,6 +5,7 @@ module.exports = function (app, myDataBase) {
       message: "Please login",
       showLogin: true,
       showRegistration: true,
+      showSocialAuth: true,
     });
   });
 
