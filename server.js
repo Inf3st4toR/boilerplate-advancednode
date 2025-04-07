@@ -81,14 +81,25 @@ myDB(async (client) => {
     res.render("profile", { username: req.user.username });
   });
 
+  // Handle Logout
+  app.route("/logout").get((req, res) => {
+    req.logout();
+    res.redirect("/");
+  });
+
+  // Handle 404 error
+  app.use((req, res, next) => {
+    res.status(404).type("text").send("Not Found");
+  });
+
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log("Listening on port " + PORT);
+  });
+
   //End of myDB Block
 }).catch((e) => {
   app.route("/").get((req, res) => {
     res.render("index", { title: e, message: "Unable to connect to database" });
   });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("Listening on port " + PORT);
 });
