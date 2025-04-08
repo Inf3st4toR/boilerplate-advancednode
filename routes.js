@@ -1,4 +1,4 @@
-module.exports = function (app, myDataBase) {
+module.exports = function (app, myDataBase, ensureAuthenticated) {
   app.route("/").get((req, res) => {
     res.render("index", {
       title: "Connected to Database",
@@ -7,6 +7,16 @@ module.exports = function (app, myDataBase) {
       showRegistration: true,
       showSocialAuth: true,
     });
+  });
+
+  //Login route
+  app.get("/profile", ensureAuthenticated, (req, res) => {
+    res.render("profile", { username: req.user.username });
+  });
+
+  //Route to chat
+  app.get("/chat", ensureAuthenticated, (req, res) => {
+    res.render("chat", { user: req.user });
   });
 
   // Logout route

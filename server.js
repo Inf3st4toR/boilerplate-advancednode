@@ -17,8 +17,8 @@ app.use(express.urlencoded({ extended: true }));
 
 myDB(async (client) => {
   const myDataBase = await client.db("database").collection("users");
-  auth(app, myDataBase);
-  routes(app, myDataBase);
+  const authMiddleware = auth(app, myDataBase);
+  routes(app, myDataBase, authMiddleware.ensureAuthenticated);
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {

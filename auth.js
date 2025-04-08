@@ -100,11 +100,6 @@ module.exports = function (app, myDataBase) {
     }
   );
 
-  //Login route
-  app.get("/profile", ensureAuthenticated, (req, res) => {
-    res.render("profile", { username: req.user.username });
-  });
-
   //Register route
   app.post(
     "/register",
@@ -136,13 +131,15 @@ module.exports = function (app, myDataBase) {
   );
 
   //Social Authentification
-  app.route("/auth/github").get(passport.authenticate("github"));
-  app
-    .route("/auth/github/callback")
-    .get(
-      passport.authenticate("github", { failureRedirect: "/" }),
-      (req, res) => {
-        res.redirect("/profile");
-      }
-    );
+  app.get("/auth/github", passport.authenticate("github"));
+  app.get(
+    "/auth/github/callback",
+    passport.authenticate("github", { failureRedirect: "/" }),
+    (req, res) => {
+      req.session.user_id = req.user.id;
+      res.redirect("/chat");
+    }
+  );
+
+  return { ensureAuthenticated: ensureAuthenticated };
 };
