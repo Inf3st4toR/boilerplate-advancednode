@@ -12,7 +12,7 @@ function ensureAuthenticated(req, res, next) {
   res.redirect("/");
 }
 
-module.exports = function (app, myDataBase) {
+module.exports = function (app, myDataBase, store) {
   // Auth setup
   app.use(
     session({
@@ -20,6 +20,8 @@ module.exports = function (app, myDataBase) {
       resave: true,
       saveUninitialized: true,
       cookie: { secure: false },
+      key: "express.sid",
+      store: store,
     })
   );
 
