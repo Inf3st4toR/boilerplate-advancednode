@@ -9,4 +9,9 @@ $(document).ready(function () {
     $("#m").val("");
     return false; // prevent form submit from refreshing page
   });
+
+  //Listen to user count
+  socket.on("user count", function (data) {
+    console.log(data);
+  });
 });

@@ -23,9 +23,13 @@ myDB(async (client) => {
   const authMiddleware = auth(app, myDataBase);
   routes(app, myDataBase, authMiddleware.ensureAuthenticated);
 
+  let currentUsers = 0;
+
   //Socket.io connection
   io.on("connection", (socket) => {
     console.log("A user has connected");
+    ++currentUsers;
+    io.emit("user count", currentUsers);
   });
 
   const PORT = process.env.PORT || 3000;

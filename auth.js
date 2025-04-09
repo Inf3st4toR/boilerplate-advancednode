@@ -60,7 +60,6 @@ module.exports = function (app, myDataBase) {
         callbackURL: "https://k2pfcg-8080.csb.app/auth/github/callback",
       },
       function (accessToken, refreshToken, profile, cb) {
-        console.log(profile);
         myDataBase.findOneAndUpdate(
           { id: profile.id },
           {
