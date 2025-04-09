@@ -30,6 +30,13 @@ myDB(async (client) => {
     console.log("A user has connected");
     ++currentUsers;
     io.emit("user count", currentUsers);
+
+    //Listen disconnect
+    socket.on("disconnect", () => {
+      --currentUsers;
+      io.emit("user count", currentUsers);
+      console.log("user dropped");
+    });
   });
 
   const PORT = process.env.PORT || 3000;

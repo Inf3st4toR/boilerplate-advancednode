@@ -12,6 +12,6 @@ $(document).ready(function () {
 
   //Listen to user count
   socket.on("user count", function (data) {
-    console.log(data);
+    console.log("User Count: " + data);
   });
 });
