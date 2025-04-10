@@ -64,6 +64,14 @@ myDB(async (client) => {
       connected: true,
     });
 
+    //Listen for messageToSend
+    socket.on("chat message", (message) => {
+      io.emit("chat message", {
+        username: socket.request.user.username,
+        message,
+      });
+    });
+
     //Listen disconnect
     socket.on("disconnect", () => {
       --currentUsers;
@@ -75,14 +83,14 @@ myDB(async (client) => {
     });
   });
 
-  const PORT = process.env.PORT || 3000;
-  http.listen(PORT, () => {
-    console.log("Listening on port " + PORT);
-  });
-
   //End of myDB Block
 }).catch((e) => {
   app.route("/").get((req, res) => {
     res.render("index", { title: e, message: "Unable to connect to database" });
   });
+});
+
+const PORT = process.env.PORT || 3000;
+http.listen(PORT, () => {
+  console.log("Listening on port " + PORT);
 });
